@@ -125,10 +125,14 @@ void updateCycleStatus() {
 
     if (!inCycle && ((cycleConfig.currentEnabled && currentDetected) || (cycleConfig.motionEnabled && motionDetected))) {
         inCycle = true;
-        sendNotification("started");
+        if (cycleConfig.startNotification) {
+            sendNotification("started");
+        }
     } else if (inCycle && (!cycleConfig.currentEnabled || !currentDetected) && (!cycleConfig.motionEnabled || !motionDetected)) {
         inCycle = false;
-        sendNotification("done");
+        if (cycleConfig.stopNotification) {
+            sendNotification("done");
+        }
     }
 
     if (cycleConfig.debugMode) {

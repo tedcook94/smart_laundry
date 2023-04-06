@@ -28,6 +28,8 @@ WiFiManagerParameter deviceNameParameter,
     currentThresholdParameter,
     currentStartDurationParameter,
     currentStopDurationParameter,
+    startNotificationParameter,
+    stopNotificationParameter,
     pushoverEnabledParameter,
     pushoverAppTokenParameter,
     pushoverUserTokenParameter,
@@ -42,7 +44,7 @@ void setupWifi() {
     pinMode(CONFIG_PIN, INPUT_PULLUP);
 
     WiFi.mode(WIFI_STA);
-    wm.setTitle("SmartLaundry");
+    wm.setTitle("Smart Laundry");
     wm.setMenu(MENU, 7);
     wm.setDarkMode(true);
     wm.setDebugOutput(false);
@@ -73,6 +75,12 @@ void setupWifi() {
         String(wifiConfig.currentStartDuration).c_str(), 4);
     new (&currentStopDurationParameter) WiFiManagerParameter("current_stop_duration", "Current Stop Duration", 
         String(wifiConfig.currentStopDuration).c_str(), 4);
+    new (&startNotificationParameter) WiFiManagerParameter("start_notification", "Start Notification", 
+        wifiConfig.startNotification ? "t" : "", 1, 
+        wifiConfig.startNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&stopNotificationParameter) WiFiManagerParameter("stop_notification", "Stop Notification", 
+        wifiConfig.stopNotification ? "t" : "", 1, 
+        wifiConfig.stopNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     new (&pushoverEnabledParameter) WiFiManagerParameter("pushover_enabled", "Pushover Enabled?", 
         wifiConfig.pushoverEnabled ? "t" : "", 1, 
         wifiConfig.pushoverEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
@@ -102,6 +110,12 @@ void setupWifi() {
     wm.addParameter(&currentThresholdParameter);
     wm.addParameter(&currentStartDurationParameter);
     wm.addParameter(&currentStopDurationParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
+
+    wm.addParameter(&startNotificationParameter);
+    wm.addParameter(&stopNotificationParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
@@ -153,6 +167,8 @@ void saveConfigFile() {
         wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
         wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
         wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
+        wifiConfig.startNotification = strncmp(startNotificationParameter.getValue(), "t", 1) == 0;
+        wifiConfig.stopNotification = strncmp(stopNotificationParameter.getValue(), "t", 1) == 0;
         wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
         wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
         wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
