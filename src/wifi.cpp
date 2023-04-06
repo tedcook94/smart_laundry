@@ -22,7 +22,8 @@ WiFiManagerParameter deviceNameParameter,
     motionEnabledParameter, 
     currentEnabledParameter,
     pushoverAppTokenParameter,
-    pushoverUserTokenParameter;
+    pushoverUserTokenParameter,
+    debugModeParameter;
 
 void saveConfigCallback() {
   Serial.println("saveConfigCallback called");
@@ -56,6 +57,9 @@ void setupWifi() {
         wifiConfig.pushoverAppToken.c_str(), 30);
     new (&pushoverUserTokenParameter) WiFiManagerParameter("pushover_user_token", "Pushover User Token", 
         wifiConfig.pushoverUserToken.c_str(), 30);
+    new (&debugModeParameter) WiFiManagerParameter("debug_mode", "Debug Mode", 
+        wifiConfig.debugMode ? "t" : "", 1, 
+        wifiConfig.debugMode ? CHECKED_BOX_HTML : UNCHECKED_BOX_HTML, WFM_LABEL_AFTER);
     
     wm.addParameter(&deviceNameParameter);
     wm.addParameter(new WiFiManagerParameter(BR_HTML));
@@ -65,6 +69,8 @@ void setupWifi() {
     wm.addParameter(new WiFiManagerParameter(BR_HTML));
     wm.addParameter(&pushoverAppTokenParameter);
     wm.addParameter(&pushoverUserTokenParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML));
+    wm.addParameter(&debugModeParameter);
 
     writeSerialToOled("Connecting to wifi...");
     wmName = "SmartLaundry_" + (wifiConfig.deviceName.length() == 0 ? WiFi.macAddress() : wifiConfig.deviceName);
@@ -100,6 +106,7 @@ void saveConfigFile() {
         wifiConfig.currentEnabled = strncmp(currentEnabledParameter.getValue(), "t", 1) == 0;
         wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
         wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
+        wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
 
         saveConfig(wifiConfig);
     }

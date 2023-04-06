@@ -127,14 +127,18 @@ void updateCycleStatus() {
         sendNotification("done");
     }
 
-    writeSerialToOled("");
-    if (cycleConfig.currentEnabled) {
-        writeSerialToOled(currentReadout);
-        writeSerialToOled(currentDetectedMessage);
-    }
-    if (cycleConfig.motionEnabled) {
-        writeSerialToOled(accelerometerReadout);
-        writeSerialToOled(motionDetectedMessage);
+    if (cycleConfig.debugMode) {
+        writeSerialToOled("");
+        if (cycleConfig.currentEnabled) {
+            writeSerialToOled(currentReadout);
+            writeSerialToOled(currentDetectedMessage);
+        }
+        if (cycleConfig.motionEnabled) {
+            writeSerialToOled(accelerometerReadout);
+            writeSerialToOled(motionDetectedMessage);
+        }
+    } else {
+        writeToCenterOfOled(inCycle ? "Cycle ongoing" : "Waiting for cycle");
     }
 
     while (millis() < loopStartTime + LOOP_MIN_DURATION) {

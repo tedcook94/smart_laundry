@@ -57,6 +57,9 @@ struct config getConfig() {
         if (json.containsKey("pushoverUserToken")) {
             configStruct.pushoverUserToken = json["pushoverUserToken"].as<String>();
         }
+        if (json.containsKey("debugMode")) {
+            configStruct.debugMode = json["debugMode"].as<bool>();
+        }
 
         configCached = true;
     }
@@ -73,6 +76,7 @@ void saveConfig(struct config config) {
     json["currentEnabled"] = config.currentEnabled;
     json["pushoverAppToken"] = config.pushoverAppToken;
     json["pushoverUserToken"] = config.pushoverUserToken;
+    json["debugMode"] = config.debugMode;
 
     File configFile = SPIFFS.open(CONFIG_FILE_LOCATION, "w");
     if (!configFile) {

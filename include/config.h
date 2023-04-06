@@ -8,6 +8,7 @@ struct config {
     bool currentEnabled = false;
     String pushoverAppToken = "";
     String pushoverUserToken = "";
+    bool debugMode = false;
 };
 
 void setupConfig();
