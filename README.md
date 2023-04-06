@@ -1,2 +1,2 @@
-# smart_laundry
+# Smart Laundry w/ ESP32
  
