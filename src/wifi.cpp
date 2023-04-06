@@ -147,7 +147,8 @@ void checkForConfigPortal() {
             configStartMillis = millis();
             configButtonPushed = true;
         } else if (millis() >= configStartMillis + CONFIG_WAIT_DURATION) {
-            writeToCenterOfOled("Configuration mode");
+            String configModeMessages[] = {"Configuration mode", WiFi.localIP().toString()};
+            writeToCenterOfOled(configModeMessages, 2);
             wm.startConfigPortal(wmName.c_str());
             saveConfigFile();
         }

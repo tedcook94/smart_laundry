@@ -87,3 +87,52 @@ void writeToCenterOfOled(String message, bool printToSerial) {
     oled.display();
     delay(2000);
 }
+
+void writeToCenterOfOled(String messages[], int messagesCount) {
+    writeToCenterOfOled(messages, messagesCount, true);
+}
+
+void writeToCenterOfOled(String messages[], int messagesCount, bool printToSerial) {
+    if (!oledConnected) {
+        Serial.println("OLED not connected");
+        return;
+    }
+
+    uint16_t textWidths[messagesCount], textHeights[messagesCount];
+    uint16_t totalTextHeight = 0;
+
+    for (int i = 0; i < messagesCount; i++) {
+        String message = messages[i];
+
+        if (printToSerial) {
+            Serial.println(message);
+        }
+
+        GFXcanvas1 canvas(SCREEN_WIDTH, SCREEN_HEIGHT);
+        int16_t x1, y1;
+        uint16_t textWidth, textHeight;
+        canvas.getTextBounds(message, 0, 0, &x1, &y1, &textWidth, &textHeight);
+
+        textWidths[i] = textWidth;
+        textHeights[i] = textHeight;
+        totalTextHeight += textHeight;
+    }
+
+    oled.clearDisplay();
+
+    int cursorY = (SCREEN_HEIGHT - totalTextHeight) / 2;
+
+    for (int i = 0; i < messagesCount; i++) {
+        String message = messages[i];
+
+        int cursorX = (SCREEN_WIDTH - textWidths[i]) / 2;
+
+        oled.setCursor(cursorX, cursorY);
+        oled.print(message);
+
+        cursorY += textHeights[i];
+    }
+
+    oled.display();
+    delay(2000);
+}

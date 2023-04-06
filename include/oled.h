@@ -12,4 +12,8 @@ void writeToCenterOfOled(String message);
 
 void writeToCenterOfOled(String message, bool printToSerial);
 
+void writeToCenterOfOled(String messages[], int messagesCount);
+
+void writeToCenterOfOled(String messages[], int messagesCount, bool printToSerial);
+
 #endif
