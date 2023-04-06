@@ -28,6 +28,7 @@ WiFiManagerParameter deviceNameParameter,
     currentThresholdParameter,
     currentStartDurationParameter,
     currentStopDurationParameter,
+    pushoverEnabledParameter,
     pushoverAppTokenParameter,
     pushoverUserTokenParameter,
     debugModeParameter;
@@ -72,6 +73,9 @@ void setupWifi() {
         String(wifiConfig.currentStartDuration).c_str(), 4);
     new (&currentStopDurationParameter) WiFiManagerParameter("current_stop_duration", "Current Stop Duration", 
         String(wifiConfig.currentStopDuration).c_str(), 4);
+    new (&pushoverEnabledParameter) WiFiManagerParameter("pushover_enabled", "Pushover Enabled?", 
+        wifiConfig.pushoverEnabled ? "t" : "", 1, 
+        wifiConfig.pushoverEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     new (&pushoverAppTokenParameter) WiFiManagerParameter("pushover_app_token", "Pushover App Token", 
         wifiConfig.pushoverAppToken.c_str(), 30);
     new (&pushoverUserTokenParameter) WiFiManagerParameter("pushover_user_token", "Pushover User Token", 
@@ -101,6 +105,9 @@ void setupWifi() {
     wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
+    wm.addParameter(&pushoverEnabledParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(&pushoverAppTokenParameter);
     wm.addParameter(&pushoverUserTokenParameter);
     wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
@@ -146,6 +153,7 @@ void saveConfigFile() {
         wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
         wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
         wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
+        wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
         wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
         wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
         wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;

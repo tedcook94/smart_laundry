@@ -72,6 +72,9 @@ struct config getConfig() {
         if (json.containsKey("pushoverAppToken")) {
             configStruct.pushoverAppToken = json["pushoverAppToken"].as<String>();
         }
+        if (json.containsKey("pushoverEnabled")) {
+            configStruct.pushoverEnabled = json["pushoverEnabled"].as<bool>();
+        }
         if (json.containsKey("pushoverUserToken")) {
             configStruct.pushoverUserToken = json["pushoverUserToken"].as<String>();
         }
@@ -98,6 +101,7 @@ void saveConfig(struct config config) {
     json["currentThreshold"] = config.currentThreshold;
     json["currentStartDuration"] = config.currentStartDuration;
     json["motionStopDuration"] = config.motionStopDuration;
+    json["pushoverEnabled"] = config.pushoverEnabled;
     json["pushoverAppToken"] = config.pushoverAppToken;
     json["pushoverUserToken"] = config.pushoverUserToken;
     json["debugMode"] = config.debugMode;

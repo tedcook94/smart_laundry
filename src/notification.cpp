@@ -38,33 +38,34 @@ void sendNotification(String cycleStatus) {
         notificationConfigLoaded = true;
     }
 
-    if (notificationConfig.pushoverAppToken.length() == 0 || notificationConfig.pushoverUserToken.length() == 0) {
-        writeToCenterOfOled("Configure Pushover");
-        return;
-    } 
+    if (notificationConfig.pushoverEnabled) {
+        if (notificationConfig.pushoverAppToken.length() == 0 || notificationConfig.pushoverUserToken.length() == 0) {
+            writeToCenterOfOled("Configure Pushover");
+        } else {
+            String pushoverParameters = "token=" + notificationConfig.pushoverAppToken + 
+                                    "&user=" + notificationConfig.pushoverUserToken + 
+                                    "&message=" + notificationConfig.deviceName + " cycle " + cycleStatus + "!";
 
-    String pushoverParameters = "token=" + notificationConfig.pushoverAppToken + 
-                                "&user=" + notificationConfig.pushoverUserToken + 
-                                "&message=" + notificationConfig.deviceName + " cycle " + cycleStatus + "!";
+            pushoverClient.setCACert(PUSHOVER_ROOT_CA);
+            if (pushoverClient.connect("api.pushover.net", 443)) {
+                pushoverClient.println("POST /1/messages.json HTTP/1.1");
+                pushoverClient.println("Host: api.pushover.net");
+                pushoverClient.println("Connection: close\r\nContent-Type: application/x-www-form-urlencoded");
+                pushoverClient.print("Content-Length: ");
+                pushoverClient.print(pushoverParameters.length());
+                pushoverClient.println("\r\n");
+                pushoverClient.print(pushoverParameters);
 
-    pushoverClient.setCACert(PUSHOVER_ROOT_CA);
-    if (pushoverClient.connect("api.pushover.net", 443)) {
-        pushoverClient.println("POST /1/messages.json HTTP/1.1");
-        pushoverClient.println("Host: api.pushover.net");
-        pushoverClient.println("Connection: close\r\nContent-Type: application/x-www-form-urlencoded");
-        pushoverClient.print("Content-Length: ");
-        pushoverClient.print(pushoverParameters.length());
-        pushoverClient.println("\r\n");
-        pushoverClient.print(pushoverParameters);
-
-        while (pushoverClient.connected()) {
-            while (pushoverClient.available()) {
-                Serial.write(pushoverClient.read());
+                while (pushoverClient.connected()) {
+                    while (pushoverClient.available()) {
+                        Serial.write(pushoverClient.read());
+                    }
+                }
+                
+                pushoverClient.stop();
+            } else {
+                writeToCenterOfOled("Pushover failed");
             }
         }
-        
-        pushoverClient.stop();
-    } else {
-        writeToCenterOfOled("Pushover failed");
     }
 }
