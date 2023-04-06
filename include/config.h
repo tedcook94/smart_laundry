@@ -5,7 +5,13 @@
 struct config {
     String deviceName = "";
     bool motionEnabled = false;
+    float motionThreshold = 15.0;
+    int motionStartDuration = 15;
+    int motionStopDuration = 180;
     bool currentEnabled = false;
+    float currentThreshold = 1.0;
+    int currentStartDuration = 0;
+    int currentStopDuration = 180;
     String pushoverAppToken = "";
     String pushoverUserToken = "";
     bool debugMode = false;

@@ -48,8 +48,26 @@ struct config getConfig() {
         if (json.containsKey("motionEnabled")) {
             configStruct.motionEnabled = json["motionEnabled"].as<bool>();
         }
+        if (json.containsKey("motionThreshold")) {
+            configStruct.motionThreshold = json["motionThreshold"].as<float>();
+        }
+        if (json.containsKey("motionStartDuration")) {
+            configStruct.motionStartDuration = json["motionStartDuration"].as<int>();
+        }
+        if (json.containsKey("motionStopDuration")) {
+            configStruct.motionStopDuration = json["motionStopDuration"].as<int>();
+        }
         if (json.containsKey("currentEnabled")) {
             configStruct.currentEnabled = json["currentEnabled"].as<bool>();
+        }
+        if (json.containsKey("currentThreshold")) {
+            configStruct.currentThreshold = json["currentThreshold"].as<float>();
+        }
+        if (json.containsKey("currentStartDuration")) {
+            configStruct.currentStartDuration = json["currentStartDuration"].as<int>();
+        }
+        if (json.containsKey("currentStopDuration")) {
+            configStruct.currentStopDuration = json["currentStopDuration"].as<int>();
         }
         if (json.containsKey("pushoverAppToken")) {
             configStruct.pushoverAppToken = json["pushoverAppToken"].as<String>();
@@ -73,7 +91,13 @@ void saveConfig(struct config config) {
     DynamicJsonDocument json(1024);
     json["deviceName"] = config.deviceName;
     json["motionEnabled"] = config.motionEnabled;
+    json["motionThreshold"] = config.motionThreshold;
+    json["motionStartDuration"] = config.motionStartDuration;
+    json["motionStopDuration"] = config.motionStopDuration;
     json["currentEnabled"] = config.currentEnabled;
+    json["currentThreshold"] = config.currentThreshold;
+    json["currentStartDuration"] = config.currentStartDuration;
+    json["motionStopDuration"] = config.motionStopDuration;
     json["pushoverAppToken"] = config.pushoverAppToken;
     json["pushoverUserToken"] = config.pushoverUserToken;
     json["debugMode"] = config.debugMode;

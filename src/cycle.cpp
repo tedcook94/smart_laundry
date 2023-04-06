@@ -5,12 +5,9 @@
 #include "notification.h"
 #include "oled.h"
 
-const float CURRENT_THRESHOLD = 1.0,
-    MOTION_THRESHOLD = 15.0 / 100.0;
+const float CURRENT_THRESHOLD = 1.0;
 const int CURRENT_START_DURATION = 0 * 1000,
     CURRENT_STOP_DURATION = 180 * 1000,
-    MOTION_START_DURATION = 15 * 1000,
-    MOTION_STOP_DURATION = 180 * 1000,
     LOOP_MIN_DURATION = 2000;
 
 struct config cycleConfig;
@@ -21,6 +18,9 @@ bool cycleConfigLoaded = false,
     currentInTransition = false, 
     motionDetected = false, 
     motionInTransition = false;
+float motionThreshold;
+int motionStartDuration,
+    motionStopDuration;
 long currentTransitionStartTime, 
     motionTransitionStartTime;
 
@@ -30,6 +30,10 @@ void updateCycleStatus() {
     if (!cycleConfigLoaded) {
         cycleConfig = getConfig();
         cycleConfigLoaded = true;
+
+        motionThreshold = cycleConfig.motionThreshold / 100.0;
+        motionStartDuration = cycleConfig.motionStartDuration * 1000;
+        motionStopDuration = cycleConfig.motionStopDuration * 1000;
     }
 
     if (!cycleConfig.motionEnabled && !cycleConfig.currentEnabled) {
@@ -80,7 +84,7 @@ void updateCycleStatus() {
 
     if (cycleConfig.motionEnabled) {
         struct accelerometer_deviation accelerometerDeviation = getAccelerometerDeviation();
-        bool motionAboveThreshold = getMaxAccelerometerDeviation(accelerometerDeviation) >= MOTION_THRESHOLD;
+        bool motionAboveThreshold = getMaxAccelerometerDeviation(accelerometerDeviation) >= motionThreshold;
 
         accelerometerReadout = "A: " + String(accelerometerDeviation.x) + ", " + 
                                     String(accelerometerDeviation.y) + ", " + 
@@ -94,7 +98,7 @@ void updateCycleStatus() {
                     motionTransitionStartTime = millis();
                 }
 
-                if (millis() >= motionTransitionStartTime + MOTION_STOP_DURATION) {
+                if (millis() >= motionTransitionStartTime + motionStopDuration) {
                     motionDetected = false;
                     motionInTransition = false;
                 }
@@ -109,7 +113,7 @@ void updateCycleStatus() {
                     motionTransitionStartTime = millis();
                 }
 
-                if (millis() >= motionTransitionStartTime + MOTION_START_DURATION) {
+                if (millis() >= motionTransitionStartTime + motionStartDuration) {
                     motionDetected = true;
                     motionInTransition = false;
                 }

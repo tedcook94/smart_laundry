@@ -5,9 +5,10 @@
 
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
-const char CHECKED_BOX_HTML[] = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\" checked",
-    UNCHECKED_BOX_HTML[] = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
-    BR_HTML[] = "<br/>";
+const String UNCHECKED_BOX_HTML = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
+    CHECKED_BOX_HTML = UNCHECKED_BOX_HTML + " checked",
+    BR_HTML = "<br/>",
+    HR_HTML = "<hr/>";
 const int CONFIG_PIN = 4,
     CONFIG_WAIT_DURATION = 5000;
 
@@ -19,8 +20,14 @@ bool shouldSaveConfig = false,
 long configStartMillis;
 String wmName;
 WiFiManagerParameter deviceNameParameter, 
-    motionEnabledParameter, 
+    motionEnabledParameter,
+    motionThresholdParameter,
+    motionStartDurationParameter,
+    motionStopDurationParameter,
     currentEnabledParameter,
+    currentThresholdParameter,
+    currentStartDurationParameter,
+    currentStopDurationParameter,
     pushoverAppTokenParameter,
     pushoverUserTokenParameter,
     debugModeParameter;
@@ -49,27 +56,56 @@ void setupWifi() {
         wifiConfig.deviceName.c_str(), 20);
     new (&motionEnabledParameter) WiFiManagerParameter("motion_enabled", "Motion Enabled?", 
         wifiConfig.motionEnabled ? "t" : "", 1, 
-        wifiConfig.motionEnabled ? CHECKED_BOX_HTML : UNCHECKED_BOX_HTML, WFM_LABEL_AFTER);
+        wifiConfig.motionEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&motionThresholdParameter) WiFiManagerParameter("motion_threshold", "Motion Threshold", 
+        String(wifiConfig.motionThreshold).c_str(), 4);
+    new (&motionStartDurationParameter) WiFiManagerParameter("motion_start_duration", "Motion Start Duration", 
+        String(wifiConfig.motionStartDuration).c_str(), 4);
+    new (&motionStopDurationParameter) WiFiManagerParameter("motion_stop_duration", "Motion Stop Duration", 
+        String(wifiConfig.motionStopDuration).c_str(), 4);
     new (&currentEnabledParameter) WiFiManagerParameter("current_enabled", "Current Enabled?", 
         wifiConfig.currentEnabled ? "t" : "", 1, 
-        wifiConfig.currentEnabled ? CHECKED_BOX_HTML : UNCHECKED_BOX_HTML, WFM_LABEL_AFTER);
+        wifiConfig.currentEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&currentThresholdParameter) WiFiManagerParameter("current_threshold", "Current Threshold", 
+        String(wifiConfig.currentThreshold).c_str(), 4);
+    new (&currentStartDurationParameter) WiFiManagerParameter("current_start_duration", "Current Start Duration", 
+        String(wifiConfig.currentStartDuration).c_str(), 4);
+    new (&currentStopDurationParameter) WiFiManagerParameter("current_stop_duration", "Current Stop Duration", 
+        String(wifiConfig.currentStopDuration).c_str(), 4);
     new (&pushoverAppTokenParameter) WiFiManagerParameter("pushover_app_token", "Pushover App Token", 
         wifiConfig.pushoverAppToken.c_str(), 30);
     new (&pushoverUserTokenParameter) WiFiManagerParameter("pushover_user_token", "Pushover User Token", 
         wifiConfig.pushoverUserToken.c_str(), 30);
     new (&debugModeParameter) WiFiManagerParameter("debug_mode", "Debug Mode", 
         wifiConfig.debugMode ? "t" : "", 1, 
-        wifiConfig.debugMode ? CHECKED_BOX_HTML : UNCHECKED_BOX_HTML, WFM_LABEL_AFTER);
+        wifiConfig.debugMode ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     
     wm.addParameter(&deviceNameParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML));
+    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
+
     wm.addParameter(&motionEnabledParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(&motionThresholdParameter);
+    wm.addParameter(&motionStartDurationParameter);
+    wm.addParameter(&motionStopDurationParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
+
     wm.addParameter(&currentEnabledParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML));
-    wm.addParameter(new WiFiManagerParameter(BR_HTML));
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(&currentThresholdParameter);
+    wm.addParameter(&currentStartDurationParameter);
+    wm.addParameter(&currentStopDurationParameter);
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
+
     wm.addParameter(&pushoverAppTokenParameter);
     wm.addParameter(&pushoverUserTokenParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML));
+    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
+    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
+
     wm.addParameter(&debugModeParameter);
 
     writeSerialToOled("Connecting to wifi...");
@@ -103,7 +139,13 @@ void saveConfigFile() {
     if (shouldSaveConfig) {
         wifiConfig.deviceName = deviceNameParameter.getValue();
         wifiConfig.motionEnabled = strncmp(motionEnabledParameter.getValue(), "t", 1) == 0;
+        wifiConfig.motionThreshold = atof(motionThresholdParameter.getValue());
+        wifiConfig.motionStartDuration = atoi(motionStartDurationParameter.getValue());
+        wifiConfig.motionStopDuration = atoi(motionStopDurationParameter.getValue());
         wifiConfig.currentEnabled = strncmp(currentEnabledParameter.getValue(), "t", 1) == 0;
+        wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
+        wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
+        wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
         wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
         wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
         wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
