@@ -42,9 +42,10 @@ void sendNotification(String cycleStatus) {
         if (notificationConfig.pushoverAppToken.length() == 0 || notificationConfig.pushoverUserToken.length() == 0) {
             writeToCenterOfOled("Configure Pushover", true, 5000);
         } else {
+            String deviceName = notificationConfig.deviceName.length() == 0 ? "Laundry" : notificationConfig.deviceName;
             String pushoverParameters = "token=" + notificationConfig.pushoverAppToken + 
                                     "&user=" + notificationConfig.pushoverUserToken + 
-                                    "&message=" + notificationConfig.deviceName + " cycle " + cycleStatus + "!";
+                                    "&message=" + deviceName + " cycle " + cycleStatus + "!";
 
             pushoverClient.setCACert(PUSHOVER_ROOT_CA);
             if (pushoverClient.connect("api.pushover.net", 443)) {
