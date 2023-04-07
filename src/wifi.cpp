@@ -3,14 +3,20 @@
 #include "oled.h"
 #include <WiFiManager.h>
 
+#ifdef ESP32DEV
+#define CONFIG_PIN 4
+#endif
+
+#ifdef QTPY
+#define CONFIG_PIN 18
+#endif
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
 const String UNCHECKED_BOX_HTML = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
     CHECKED_BOX_HTML = UNCHECKED_BOX_HTML + " checked",
     BR_HTML = "<br/>",
     HR_HTML = "<hr/>";
-const int CONFIG_PIN = 4,
-    CONFIG_WAIT_DURATION = 5000;
+const int CONFIG_WAIT_DURATION = 5000;
 
 WiFiManager wm;
 struct config wifiConfig;
