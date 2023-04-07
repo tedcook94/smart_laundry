@@ -23,6 +23,7 @@ int motionStartDuration,
     motionStopDuration;
 long currentTransitionStartTime, 
     motionTransitionStartTime;
+String progressBar = ".......";
 
 void updateCycleStatus() {
     long loopStartTime = millis();
@@ -37,7 +38,7 @@ void updateCycleStatus() {
     }
 
     if (!cycleConfig.motionEnabled && !cycleConfig.currentEnabled) {
-        writeToCenterOfOled("No detectors enabled");
+        writeToCenterOfOled("No detectors enabled", true, 0);
         return;
     }
 
@@ -125,11 +126,13 @@ void updateCycleStatus() {
 
     if (!inCycle && ((cycleConfig.currentEnabled && currentDetected) || (cycleConfig.motionEnabled && motionDetected))) {
         inCycle = true;
+        progressBar = ".......";
         if (cycleConfig.startNotification) {
             sendNotification("started");
         }
     } else if (inCycle && (!cycleConfig.currentEnabled || !currentDetected) && (!cycleConfig.motionEnabled || !motionDetected)) {
         inCycle = false;
+        progressBar = ".......";
         if (cycleConfig.stopNotification) {
             sendNotification("done");
         }
@@ -146,7 +149,14 @@ void updateCycleStatus() {
             writeSerialToOled(motionDetectedMessage);
         }
     } else {
-        writeToCenterOfOled(inCycle ? "Cycle ongoing" : "Waiting for cycle");
+        String cycleMessage = inCycle ? "Cycle ongoing" : "Waiting for cycle";
+        if (progressBar.length() == 7) {
+            progressBar = ".";
+        } else {
+            progressBar += ".";
+        }
+        String cycleMessages[] = {cycleMessage, progressBar};
+        writeToCenterOfOled(cycleMessages, 2, false, 0);
     }
 
     while (millis() < loopStartTime + LOOP_MIN_DURATION) {

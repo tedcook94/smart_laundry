@@ -132,7 +132,7 @@ void setupWifi() {
     writeSerialToOled("Connecting to wifi...");
     wmName = "SmartLaundry_" + (wifiConfig.deviceName.length() == 0 ? WiFi.macAddress() : wifiConfig.deviceName);
     if (!wm.autoConnect(wmName.c_str())) {
-        writeToCenterOfOled("Wifi failed");
+        writeToCenterOfOled("Wifi failed", true, 5000);
         wm.reboot();
     } else {
         writeSerialToOled("Wifi connected");
@@ -148,7 +148,7 @@ void checkForConfigPortal() {
             configButtonPushed = true;
         } else if (millis() >= configStartMillis + CONFIG_WAIT_DURATION) {
             String configModeMessages[] = {"Configuration mode", WiFi.localIP().toString()};
-            writeToCenterOfOled(configModeMessages, 2);
+            writeToCenterOfOled(configModeMessages, 2, true, 0);
             wm.startConfigPortal(wmName.c_str());
             saveConfigFile();
         }

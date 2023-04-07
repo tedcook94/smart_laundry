@@ -40,7 +40,7 @@ void sendNotification(String cycleStatus) {
 
     if (notificationConfig.pushoverEnabled) {
         if (notificationConfig.pushoverAppToken.length() == 0 || notificationConfig.pushoverUserToken.length() == 0) {
-            writeToCenterOfOled("Configure Pushover");
+            writeToCenterOfOled("Configure Pushover", true, 5000);
         } else {
             String pushoverParameters = "token=" + notificationConfig.pushoverAppToken + 
                                     "&user=" + notificationConfig.pushoverUserToken + 
@@ -64,7 +64,7 @@ void sendNotification(String cycleStatus) {
                 
                 pushoverClient.stop();
             } else {
-                writeToCenterOfOled("Pushover failed");
+                writeToCenterOfOled("Pushover failed", true, 5000);
             }
         }
     }

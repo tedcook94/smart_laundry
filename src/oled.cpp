@@ -64,6 +64,10 @@ void writeToCenterOfOled(String message) {
 }
 
 void writeToCenterOfOled(String message, bool printToSerial) {
+    writeToCenterOfOled(message, printToSerial, 2000);
+}
+
+void writeToCenterOfOled(String message, bool printToSerial, int delayDuration) {
     if (!oledConnected) {
         Serial.println("OLED not connected");
         return;
@@ -85,7 +89,7 @@ void writeToCenterOfOled(String message, bool printToSerial) {
     oled.setCursor(cursorX, cursorY);
     oled.print(message);
     oled.display();
-    delay(2000);
+    delay(delayDuration);
 }
 
 void writeToCenterOfOled(String messages[], int messagesCount) {
@@ -93,6 +97,10 @@ void writeToCenterOfOled(String messages[], int messagesCount) {
 }
 
 void writeToCenterOfOled(String messages[], int messagesCount, bool printToSerial) {
+    writeToCenterOfOled(messages, messagesCount, printToSerial, 2000);
+}
+
+void writeToCenterOfOled(String messages[], int messagesCount, bool printToSerial, int delayDuration) {
     if (!oledConnected) {
         Serial.println("OLED not connected");
         return;
@@ -134,5 +142,5 @@ void writeToCenterOfOled(String messages[], int messagesCount, bool printToSeria
     }
 
     oled.display();
-    delay(2000);
+    delay(delayDuration);
 }
