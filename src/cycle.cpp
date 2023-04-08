@@ -38,7 +38,7 @@ void updateCycleStatus() {
     }
 
     if (!cycleConfig.motionEnabled && !cycleConfig.currentEnabled) {
-        writeToCenterOfOled("No detectors enabled", true, 0);
+        writeToCenterOfOled("No detectors enabled", true, LOOP_MIN_DURATION);
         return;
     }
 
