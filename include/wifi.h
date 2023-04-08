@@ -6,6 +6,6 @@ void setupWifi();
 
 void checkForConfigPortal();
 
-void saveConfigFile();
+void saveWifiConfig();
 
 #endif

@@ -12,17 +12,22 @@
 #endif
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
+const char* STYLE_CSS = "<style>" \
+                        "   #device_name, #motion_stop_duration, #current_stop_duration, #stop_notification, #pushover_user_token" \
+                        "       { margin-bottom: 25px; }" \
+                        "   #motion_enabled, #current_enabled, #pushover_enabled" \
+                        "       { margin-bottom: 10px; }" \
+                        "   label[for='motion_enabled']::after, label[for='current_enabled']::after, label[for='pushover_enabled']::after" \
+                        "       { content: ''; display: block; }" \
+                        "</style>";
 const String UNCHECKED_BOX_HTML = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
-    CHECKED_BOX_HTML = UNCHECKED_BOX_HTML + " checked",
-    BR_HTML = "<br/>",
-    HR_HTML = "<hr/>";
+    CHECKED_BOX_HTML = UNCHECKED_BOX_HTML + " checked";
 const int CONFIG_WAIT_DURATION = 5000;
 
 WiFiManager wm;
 struct config wifiConfig;
 
-bool shouldSaveConfig = false, 
-    configButtonPushed = false;
+bool configButtonPushed = false;
 long configStartMillis;
 String wmName;
 WiFiManagerParameter deviceNameParameter, 
@@ -41,11 +46,6 @@ WiFiManagerParameter deviceNameParameter,
     pushoverUserTokenParameter,
     debugModeParameter;
 
-void saveConfigCallback() {
-  Serial.println("saveConfigCallback called");
-  shouldSaveConfig = true;
-}
-
 void setupWifi() {
     pinMode(CONFIG_PIN, INPUT_PULLUP);
 
@@ -53,11 +53,10 @@ void setupWifi() {
     wm.setTitle("Smart Laundry");
     wm.setMenu(MENU, 7);
     wm.setDarkMode(true);
+    wm.setCustomHeadElement(STYLE_CSS);
     wm.setDebugOutput(false);
     wm.setConfigPortalTimeout(300);
-    wm.setSaveConfigCallback(saveConfigCallback);
-    wm.setPreSaveConfigCallback(saveConfigCallback);
-    wm.setPreSaveParamsCallback(saveConfigCallback);
+    wm.setSaveParamsCallback(saveWifiConfig);
 
     wifiConfig = getConfig();
 
@@ -99,39 +98,23 @@ void setupWifi() {
         wifiConfig.debugMode ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     
     wm.addParameter(&deviceNameParameter);
-    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
     wm.addParameter(&motionEnabledParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(&motionThresholdParameter);
     wm.addParameter(&motionStartDurationParameter);
     wm.addParameter(&motionStopDurationParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
     wm.addParameter(&currentEnabledParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(&currentThresholdParameter);
     wm.addParameter(&currentStartDurationParameter);
     wm.addParameter(&currentStopDurationParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
     wm.addParameter(&startNotificationParameter);
     wm.addParameter(&stopNotificationParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
     wm.addParameter(&pushoverEnabledParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
     wm.addParameter(&pushoverAppTokenParameter);
     wm.addParameter(&pushoverUserTokenParameter);
-    wm.addParameter(new WiFiManagerParameter(BR_HTML.c_str()));
-    wm.addParameter(new WiFiManagerParameter(HR_HTML.c_str()));
 
     wm.addParameter(&debugModeParameter);
 
@@ -143,8 +126,6 @@ void setupWifi() {
     } else {
         writeSerialToOled("Wifi connected");
     }
-
-    saveConfigFile();
 }
 
 void checkForConfigPortal() {
@@ -156,31 +137,28 @@ void checkForConfigPortal() {
             String configModeMessages[] = {"Configuration mode", WiFi.localIP().toString()};
             writeToCenterOfOled(configModeMessages, 2, true, 0);
             wm.startConfigPortal(wmName.c_str());
-            saveConfigFile();
         }
     } else {
         configButtonPushed = false;
     }
 }
 
-void saveConfigFile() {
-    if (shouldSaveConfig) {
-        wifiConfig.deviceName = deviceNameParameter.getValue();
-        wifiConfig.motionEnabled = strncmp(motionEnabledParameter.getValue(), "t", 1) == 0;
-        wifiConfig.motionThreshold = atof(motionThresholdParameter.getValue());
-        wifiConfig.motionStartDuration = atoi(motionStartDurationParameter.getValue());
-        wifiConfig.motionStopDuration = atoi(motionStopDurationParameter.getValue());
-        wifiConfig.currentEnabled = strncmp(currentEnabledParameter.getValue(), "t", 1) == 0;
-        wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
-        wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
-        wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
-        wifiConfig.startNotification = strncmp(startNotificationParameter.getValue(), "t", 1) == 0;
-        wifiConfig.stopNotification = strncmp(stopNotificationParameter.getValue(), "t", 1) == 0;
-        wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
-        wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
-        wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
-        wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
+void saveWifiConfig() {
+    wifiConfig.deviceName = deviceNameParameter.getValue();
+    wifiConfig.motionEnabled = strncmp(motionEnabledParameter.getValue(), "t", 1) == 0;
+    wifiConfig.motionThreshold = atof(motionThresholdParameter.getValue());
+    wifiConfig.motionStartDuration = atoi(motionStartDurationParameter.getValue());
+    wifiConfig.motionStopDuration = atoi(motionStopDurationParameter.getValue());
+    wifiConfig.currentEnabled = strncmp(currentEnabledParameter.getValue(), "t", 1) == 0;
+    wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
+    wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
+    wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
+    wifiConfig.startNotification = strncmp(startNotificationParameter.getValue(), "t", 1) == 0;
+    wifiConfig.stopNotification = strncmp(stopNotificationParameter.getValue(), "t", 1) == 0;
+    wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
+    wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
+    wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
+    wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
 
-        saveConfig(wifiConfig);
-    }
+    saveConfig(wifiConfig);
 }
