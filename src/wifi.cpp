@@ -56,6 +56,7 @@ void setupWifi() {
     wm.setCustomHeadElement(STYLE_CSS);
     wm.setDebugOutput(false);
     wm.setConfigPortalTimeout(300);
+    wm.setSaveConfigCallback(saveWifiConfig);
     wm.setSaveParamsCallback(saveWifiConfig);
 
     wifiConfig = getConfig();
