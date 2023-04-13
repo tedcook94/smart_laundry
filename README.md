@@ -70,9 +70,11 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
     - The number of consecutive seconds of no current above threshold being detected required to trigger the end of a cycle.
         - Note: all enabled detectors must meet the criteria to stop a cycle
 <!-- -->
-- Start Notification (default: checked)
+- Startup Notification (default: checked)
+    - Determines whether or not a notification is sent when the Smart Laundry turns on and connects to wifi.
+- Cycle Start Notification (default: checked)
     - Determines whether or not a notification is sent at the beginning of a cycle.
-- Stop Notification (default: checked)
+- Cycle Stop Notification (default: checked)
     - Determines whether or not a notification is sent at the end of a cycle.
 <!-- -->
 - Pushover Enabled? (default: un-checked)

@@ -72,11 +72,14 @@ struct config getConfig() {
         if (json.containsKey("pushoverAppToken")) {
             configStruct.pushoverAppToken = json["pushoverAppToken"].as<String>();
         }
-        if (json.containsKey("startNotification")) {
-            configStruct.startNotification = json["startNotification"].as<bool>();
+        if (json.containsKey("startupNotification")) {
+            configStruct.startupNotification = json["startupNotification"].as<bool>();
         }
-        if (json.containsKey("stopNotification")) {
-            configStruct.stopNotification = json["stopNotification"].as<bool>();
+        if (json.containsKey("cycleStartNotification")) {
+            configStruct.cycleStartNotification = json["cycleStartNotification"].as<bool>();
+        }
+        if (json.containsKey("cycleStopNotification")) {
+            configStruct.cycleStopNotification = json["cycleStopNotification"].as<bool>();
         }
         if (json.containsKey("pushoverEnabled")) {
             configStruct.pushoverEnabled = json["pushoverEnabled"].as<bool>();
@@ -107,8 +110,9 @@ void saveConfig(struct config config) {
     json["currentThreshold"] = config.currentThreshold;
     json["currentStartDuration"] = config.currentStartDuration;
     json["motionStopDuration"] = config.motionStopDuration;
-    json["startNotification"] = config.startNotification;
-    json["stopNotification"] = config.stopNotification;
+    json["startupNotification"] = config.startupNotification;
+    json["cycleStartNotification"] = config.cycleStartNotification;
+    json["cycleStopNotification"] = config.cycleStopNotification;
     json["pushoverEnabled"] = config.pushoverEnabled;
     json["pushoverAppToken"] = config.pushoverAppToken;
     json["pushoverUserToken"] = config.pushoverUserToken;

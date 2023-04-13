@@ -2,6 +2,8 @@
 #define NOTIFICATION_H
 #include <Arduino.h>
 
-void sendNotification(String cycleStatus);
+void sendStartupNotification();
+
+void sendCycleNotification(String cycleStatus);
 
 #endif

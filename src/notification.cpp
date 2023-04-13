@@ -32,20 +32,25 @@ struct config notificationConfig;
 
 bool notificationConfigLoaded = false;
 
-void sendNotification(String cycleStatus) {
+void loadNotificationConfig() {
     if (!notificationConfigLoaded) {
         notificationConfig = getConfig();
         notificationConfigLoaded = true;
     }
+}
 
+String getDeviceName() {
+    return notificationConfig.deviceName.length() == 0 ? "Smart Laundry" : notificationConfig.deviceName;
+}
+
+void sendPushoverNotification(String message) {
     if (notificationConfig.pushoverEnabled) {
         if (notificationConfig.pushoverAppToken.length() == 0 || notificationConfig.pushoverUserToken.length() == 0) {
             writeToCenterOfOled("Configure Pushover", true, 5000);
         } else {
-            String deviceName = notificationConfig.deviceName.length() == 0 ? "Laundry" : notificationConfig.deviceName;
             String pushoverParameters = "token=" + notificationConfig.pushoverAppToken + 
                                     "&user=" + notificationConfig.pushoverUserToken + 
-                                    "&message=" + deviceName + " cycle " + cycleStatus + "!";
+                                    "&message=" + message;
 
             pushoverClient.setCACert(PUSHOVER_ROOT_CA);
             if (pushoverClient.connect("api.pushover.net", 443)) {
@@ -69,4 +74,16 @@ void sendNotification(String cycleStatus) {
             }
         }
     }
+}
+
+void sendStartupNotification() {
+    loadNotificationConfig();
+
+    sendPushoverNotification(getDeviceName() + " has started and is online!");
+}
+
+void sendCycleNotification(String cycleStatus) {
+    loadNotificationConfig();
+
+    sendPushoverNotification(getDeviceName() + " cycle " + cycleStatus + "!");
 }

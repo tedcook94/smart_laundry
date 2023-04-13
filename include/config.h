@@ -12,8 +12,9 @@ struct config {
     float currentThreshold = 1.0;
     int currentStartDuration = 0;
     int currentStopDuration = 180;
-    bool startNotification = true;
-    bool stopNotification = true;
+    bool startupNotification = true;
+    bool cycleStartNotification = true;
+    bool cycleStopNotification = true;
     bool pushoverEnabled = false;
     String pushoverAppToken = "";
     String pushoverUserToken = "";

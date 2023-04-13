@@ -1,5 +1,6 @@
 #include "wifi.h"
 #include "config.h"
+#include "notification.h"
 #include "oled.h"
 #include <WiFiManager.h>
 
@@ -13,7 +14,7 @@
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
 const char* STYLE_CSS = "<style>" \
-                        "   #device_name, #motion_stop_duration, #current_stop_duration, #stop_notification, #pushover_user_token" \
+                        "   #device_name, #motion_stop_duration, #current_stop_duration, #cycle_stop_notification, #pushover_user_token" \
                         "       { margin-bottom: 25px; }" \
                         "   #motion_enabled, #current_enabled, #pushover_enabled" \
                         "       { margin-bottom: 10px; }" \
@@ -39,8 +40,9 @@ WiFiManagerParameter deviceNameParameter,
     currentThresholdParameter,
     currentStartDurationParameter,
     currentStopDurationParameter,
-    startNotificationParameter,
-    stopNotificationParameter,
+    startupNotificationParameter,
+    cycleStartNotificationParameter,
+    cycleStopNotificationParameter,
     pushoverEnabledParameter,
     pushoverAppTokenParameter,
     pushoverUserTokenParameter,
@@ -81,12 +83,15 @@ void setupWifi() {
         String(wifiConfig.currentStartDuration).c_str(), 4);
     new (&currentStopDurationParameter) WiFiManagerParameter("current_stop_duration", "Current Stop Duration", 
         String(wifiConfig.currentStopDuration).c_str(), 4);
-    new (&startNotificationParameter) WiFiManagerParameter("start_notification", "Start Notification", 
-        wifiConfig.startNotification ? "t" : "", 1, 
-        wifiConfig.startNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
-    new (&stopNotificationParameter) WiFiManagerParameter("stop_notification", "Stop Notification", 
-        wifiConfig.stopNotification ? "t" : "", 1, 
-        wifiConfig.stopNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&startupNotificationParameter) WiFiManagerParameter("startup_notification", "Startup Notification", 
+        wifiConfig.startupNotification ? "t" : "", 1, 
+        wifiConfig.startupNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&cycleStartNotificationParameter) WiFiManagerParameter("cycle_start_notification", "Cycle Start Notification", 
+        wifiConfig.cycleStartNotification ? "t" : "", 1, 
+        wifiConfig.cycleStartNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&cycleStopNotificationParameter) WiFiManagerParameter("cycle_stop_notification", "Cycle Stop Notification", 
+        wifiConfig.cycleStopNotification ? "t" : "", 1, 
+        wifiConfig.cycleStopNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     new (&pushoverEnabledParameter) WiFiManagerParameter("pushover_enabled", "Pushover Enabled?", 
         wifiConfig.pushoverEnabled ? "t" : "", 1, 
         wifiConfig.pushoverEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
@@ -110,8 +115,9 @@ void setupWifi() {
     wm.addParameter(&currentStartDurationParameter);
     wm.addParameter(&currentStopDurationParameter);
 
-    wm.addParameter(&startNotificationParameter);
-    wm.addParameter(&stopNotificationParameter);
+    wm.addParameter(&startupNotificationParameter);
+    wm.addParameter(&cycleStartNotificationParameter);
+    wm.addParameter(&cycleStopNotificationParameter);
 
     wm.addParameter(&pushoverEnabledParameter);
     wm.addParameter(&pushoverAppTokenParameter);
@@ -126,6 +132,9 @@ void setupWifi() {
         wm.reboot();
     } else {
         writeSerialToOled("Wifi connected");
+        if (wifiConfig.startupNotification) {
+            sendStartupNotification();
+        }
     }
 }
 
@@ -154,8 +163,9 @@ void saveWifiConfig() {
     wifiConfig.currentThreshold = atof(currentThresholdParameter.getValue());
     wifiConfig.currentStartDuration = atoi(currentStartDurationParameter.getValue());
     wifiConfig.currentStopDuration = atoi(currentStopDurationParameter.getValue());
-    wifiConfig.startNotification = strncmp(startNotificationParameter.getValue(), "t", 1) == 0;
-    wifiConfig.stopNotification = strncmp(stopNotificationParameter.getValue(), "t", 1) == 0;
+    wifiConfig.startupNotification = strncmp(startupNotificationParameter.getValue(), "t", 1) == 0;
+    wifiConfig.cycleStartNotification = strncmp(cycleStartNotificationParameter.getValue(), "t", 1) == 0;
+    wifiConfig.cycleStopNotification = strncmp(cycleStopNotificationParameter.getValue(), "t", 1) == 0;
     wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
     wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
     wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();

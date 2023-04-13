@@ -127,14 +127,14 @@ void updateCycleStatus() {
     if (!inCycle && ((cycleConfig.currentEnabled && currentDetected) || (cycleConfig.motionEnabled && motionDetected))) {
         inCycle = true;
         progressBar = ".......";
-        if (cycleConfig.startNotification) {
-            sendNotification("started");
+        if (cycleConfig.cycleStartNotification) {
+            sendCycleNotification("started");
         }
     } else if (inCycle && (!cycleConfig.currentEnabled || !currentDetected) && (!cycleConfig.motionEnabled || !motionDetected)) {
         inCycle = false;
         progressBar = ".......";
-        if (cycleConfig.stopNotification) {
-            sendNotification("done");
+        if (cycleConfig.cycleStopNotification) {
+            sendCycleNotification("done");
         }
     }
 
