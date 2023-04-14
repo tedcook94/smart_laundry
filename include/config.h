@@ -7,11 +7,11 @@ struct config {
     bool motionEnabled = false;
     float motionThreshold = 15.0;
     int motionStartDuration = 15;
-    int motionStopDuration = 180;
+    int motionStopDuration = 300;
     bool currentEnabled = false;
     float currentThreshold = 1.0;
     int currentStartDuration = 0;
-    int currentStopDuration = 180;
+    int currentStopDuration = 300;
     bool startupNotification = true;
     bool cycleStartNotification = true;
     bool cycleStopNotification = true;

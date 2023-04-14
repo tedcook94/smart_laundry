@@ -55,7 +55,7 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
 - Motion Start Duration (default: 15)
     - The number of consecutive seconds of motion above threshold required to trigger the start of a cycle.
         - Note: only one detector (motion or current) must meet the criteria to start a cycle
-- Motion Stop Duration (default: 180)
+- Motion Stop Duration (default: 300)
     - The number of consecutive seconds of no motion above threshold being detected required to trigger the end of a cycle.
         - Note: all enabled detectors must meet the criteria to stop a cycle
 <!-- -->
@@ -66,7 +66,7 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
 - Current Start Duration (default: 0)
     - The number of consecutive seconds of current above threshold required to trigger the start of a cycle.
         - Note: only one detector (motion or current) must meet the criteria to start a cycle
-- Current Stop Duration (default: 180)
+- Current Stop Duration (default: 300)
     - The number of consecutive seconds of no current above threshold being detected required to trigger the end of a cycle.
         - Note: all enabled detectors must meet the criteria to stop a cycle
 <!-- -->
