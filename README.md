@@ -6,7 +6,8 @@ An IoT project with the goal of automatically identifying the beginning and end 
 
 If you plan on using the included PCB files or enclosure designs, ensure that your parts match the pinouts and dimensions of the examples provided.
 
-- 30-pin ESP32 development board w/ USB-C ([example](https://www.amazon.com/dp/B0B19KRPRC))
+- Adafruit QT Py ESP32-S3 ([link](https://www.adafruit.com/product/5426)) or 30-pin ESP32 development board w/ USB-C ([example](https://www.amazon.com/dp/B0B19KRPRC))
+    - The QT Py is recommended over the generic ESP32 dev board for being much smaller and having better wifi reception (in my experience). It is more expensive though, so the dev boards are a decent alternative (and still good for other projects).
 - 0.96" 128x64 OLED ([example](https://www.amazon.com/gp/product/B0833PF7ML))
 - 6x6x6mm side-mounting momentary button ([example](https://www.amazon.com/dp/B07JLDLV3R))
 <!-- -->
@@ -25,7 +26,7 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
 ## Setup
 
 1. Flash the firmware to your board and ensure that it is successfully flased. For more info on how to compile and flash the firmware code, see the [Compiling and Development](#compiling-and-development) section of the README.
-1. Assemble everything on a breadboard by following the [schematic](extras/esp32dev-schematic.png), or order a PCB using the [Gerber files](extras/esp32dev-gerber.zip) and solder your components to it.
+1. Assemble everything on a breadboard by following the [schematic](extras/schematics/) for your board, or order a PCB using the [Gerber files](/extras/gerber/) for your board and solder your components to it.
     - You can exclude any components you opted out of.
 1. Plug in your Smart Laundry's USB port to power it on. You should see a "Starting up.." message and your Smart Laundry will then start configuring itself.
     - The first startup and configuration may take longer as the filesystem has to be formatted for use.
