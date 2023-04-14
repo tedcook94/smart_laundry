@@ -14,11 +14,11 @@
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
 const char* STYLE_CSS = "<style>" \
-                        "   #device_name, #motion_stop_duration, #current_stop_duration, #cycle_stop_notification, #pushover_user_token, #twilio_to_numbers" \
+                        "   #device_name, #motion_stop_duration, #current_stop_duration, #cycle_stop_notification, #pushover_user_token, #twilio_to_numbers, #email_to_addresses" \
                         "       { margin-bottom: 25px; }" \
-                        "   #motion_enabled, #current_enabled, #pushover_enabled, #twilio_enabled" \
+                        "   #motion_enabled, #current_enabled, #pushover_enabled, #twilio_enabled, #email_enabled" \
                         "       { margin-bottom: 10px; }" \
-                        "   label[for='motion_enabled']::after, label[for='current_enabled']::after, label[for='pushover_enabled']::after, label[for='twilio_enabled']::after" \
+                        "   label[for='motion_enabled']::after, label[for='current_enabled']::after, label[for='pushover_enabled']::after, label[for='twilio_enabled']::after, label[for='email_enabled']::after" \
                         "       { content: ''; display: block; }" \
                         "</style>";
 const String UNCHECKED_BOX_HTML = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
@@ -51,6 +51,12 @@ WiFiManagerParameter deviceNameParameter,
     twilioAuthTokenParameter,
     twilioFromNumberParameter,
     twilioToNumbersParameter,
+    emailEnabledParameter,
+    emailSmtpHostParameter,
+    emailSmtpPortParameter,
+    emailSmtpAccountParameter,
+    emailSmtpPasswordParameter,
+    emailToAddressesParameter,
     debugModeParameter;
 
 void setupWifi() {
@@ -115,6 +121,19 @@ void setupWifi() {
         wifiConfig.twilioFromNumber.c_str(), 16);
     new (&twilioToNumbersParameter) WiFiManagerParameter("twilio_to_numbers", "Twilio To Numbers", 
         wifiConfig.twilioToNumbers.c_str(), 100);
+    new (&emailEnabledParameter) WiFiManagerParameter("email_enabled", "Email Enabled?", 
+        wifiConfig.emailEnabled ? "t" : "", 1, 
+        wifiConfig.emailEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&emailSmtpHostParameter) WiFiManagerParameter("email_smtp_host", "Email SMTP Host", 
+        wifiConfig.emailSmtpHost.c_str(), 40);
+    new (&emailSmtpPortParameter) WiFiManagerParameter("email_smtp_port", "Email SMTP Port", 
+        String(wifiConfig.emailSmtpPort).c_str(), 3);
+    new (&emailSmtpAccountParameter) WiFiManagerParameter("email_smtp_account", "Email SMTP Account", 
+        wifiConfig.emailSmtpAccount.c_str(), 40);
+    new (&emailSmtpPasswordParameter) WiFiManagerParameter("email_smtp_password", "Email SMTP Password", 
+        wifiConfig.emailSmtpPassword.c_str(), 40);
+    new (&emailToAddressesParameter) WiFiManagerParameter("email_to_addresses", "Email To Addresses", 
+        wifiConfig.emailToAddresses.c_str(), 100);
     new (&debugModeParameter) WiFiManagerParameter("debug_mode", "Debug Mode", 
         wifiConfig.debugMode ? "t" : "", 1, 
         wifiConfig.debugMode ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
@@ -144,6 +163,13 @@ void setupWifi() {
     wm.addParameter(&twilioAuthTokenParameter);
     wm.addParameter(&twilioFromNumberParameter);
     wm.addParameter(&twilioToNumbersParameter);
+
+    wm.addParameter(&emailEnabledParameter);
+    wm.addParameter(&emailSmtpHostParameter);
+    wm.addParameter(&emailSmtpPortParameter);
+    wm.addParameter(&emailSmtpAccountParameter);
+    wm.addParameter(&emailSmtpPasswordParameter);
+    wm.addParameter(&emailToAddressesParameter);
 
     wm.addParameter(&debugModeParameter);
 
@@ -196,6 +222,12 @@ void saveWifiConfig() {
     wifiConfig.twilioAuthToken = twilioAuthTokenParameter.getValue();
     wifiConfig.twilioFromNumber = twilioFromNumberParameter.getValue();
     wifiConfig.twilioToNumbers = twilioToNumbersParameter.getValue();
+    wifiConfig.emailEnabled = strncmp(emailEnabledParameter.getValue(), "t", 1) == 0;
+    wifiConfig.emailSmtpHost = emailSmtpHostParameter.getValue();
+    wifiConfig.emailSmtpPort = atoi(emailSmtpPortParameter.getValue());
+    wifiConfig.emailSmtpAccount = emailSmtpAccountParameter.getValue();
+    wifiConfig.emailSmtpPassword = emailSmtpPasswordParameter.getValue();
+    wifiConfig.emailToAddresses = emailToAddressesParameter.getValue();
     wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
 
     saveConfig(wifiConfig);

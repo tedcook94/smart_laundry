@@ -1,6 +1,7 @@
 #include "notification.h"
 #include "config.h"
 #include "oled.h"
+#include <ESP_Mail_Client.h>
 #include <twilio.hpp>
 #include <WiFiClientSecure.h>
 
@@ -28,15 +29,19 @@ const char* PUSHOVER_ROOT_CA =
     "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n" \
     "-----END CERTIFICATE-----\n";
 
+ESP_Mail_Session emailSession;
+SMTPSession smtpSession;
 Twilio *twilio;
 WiFiClientSecure pushoverClient;
 struct config notificationConfig;
 
 bool notificationConfigLoaded = false,
     pushoverNotificationSent = false,
-    twilioNotificationSent = false;
+    twilioNotificationSent = false,
+    emailNotificationSent = false;
 int pushoverAttempts = 0,
-    twilioAttempts = 0;
+    twilioAttempts = 0,
+    emailAttempts = 0;
 
 void loadNotificationConfig() {
     if (!notificationConfigLoaded) {
@@ -127,18 +132,69 @@ void sendTwilioNotification(String message) {
     }
 }
 
+void sendEmailNotification(String message) {
+    if (notificationConfig.emailEnabled) {
+        if (notificationConfig.emailSmtpHost.length() == 0 ||
+                notificationConfig.emailSmtpPort == 0 ||
+                notificationConfig.emailSmtpAccount.length() == 0 ||
+                notificationConfig.emailSmtpPassword.length() == 0 ||
+                notificationConfig.emailToAddresses.length() == 0) {
+            writeToCenterOfOled("Configure email", true, 5000);
+        } else {
+            emailSession.server.host_name = notificationConfig.emailSmtpHost;
+            emailSession.server.port = notificationConfig.emailSmtpPort;
+            emailSession.login.email = notificationConfig.emailSmtpAccount;
+            emailSession.login.password = notificationConfig.emailSmtpPassword;
+            emailSession.login.user_domain = "";
+
+            char toEmails[notificationConfig.emailToAddresses.length()];
+            notificationConfig.emailToAddresses.toCharArray(toEmails, notificationConfig.emailToAddresses.length() + 1);
+            char *currentToEmail = NULL;
+            currentToEmail = strtok(toEmails, ",");
+
+            while (currentToEmail != NULL) {
+                while (!emailNotificationSent && emailAttempts < 3) {
+                    SMTP_Message smtpMessage;
+                    smtpMessage.sender.name = getDeviceName();
+                    smtpMessage.sender.email = notificationConfig.emailSmtpAccount;
+                    smtpMessage.subject = getDeviceName() + " Update";
+                    smtpMessage.addRecipient("", currentToEmail);
+                    smtpMessage.text.content = message;
+
+                    if (!smtpSession.connect(&emailSession) || !MailClient.sendMail(&smtpSession, &smtpMessage)) {
+                        String emailFailedMessages[] = {"Email failed", currentToEmail, "Attempt " + String(emailAttempts + 1)};
+                        writeToCenterOfOled(emailFailedMessages, 3, true, 5000);
+                        emailAttempts += 1;
+                    } else {
+                        Serial.println(String("Email sent to ") + currentToEmail);
+                        emailNotificationSent = true;
+                    }
+                }
+
+                currentToEmail = strtok(NULL, ",");
+                emailNotificationSent = false;
+                emailAttempts = 0;
+            }
+        }
+    }
+}
+
+void sendNotification(String message) {
+    sendPushoverNotification(message);
+    sendTwilioNotification(message);
+    sendEmailNotification(message);
+}
+
 void sendStartupNotification() {
     loadNotificationConfig();
 
     String message = getDeviceName() + " has started and is online!";
-    sendPushoverNotification(message);
-    sendTwilioNotification(message);
+    sendNotification(message);
 }
 
 void sendCycleNotification(String cycleStatus) {
     loadNotificationConfig();
 
     String message = getDeviceName() + " cycle " + cycleStatus + "!";
-    sendPushoverNotification(message);
-    sendTwilioNotification(message);
+    sendNotification(message);
 }

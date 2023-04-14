@@ -23,6 +23,12 @@ struct config {
     String twilioAuthToken = "";
     String twilioFromNumber = "";
     String twilioToNumbers = "";
+    bool emailEnabled = false;
+    String emailSmtpHost = "";
+    int emailSmtpPort = 0;
+    String emailSmtpAccount = "";
+    String emailSmtpPassword = "";
+    String emailToAddresses = "";
     bool debugMode = false;
 };
 

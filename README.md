@@ -1,6 +1,6 @@
 # Smart Laundry
  
-An IoT project with the goal of automatically identifying the beginning and end of laundry cycles and sending notifiations (because everyone hates when they forget their clothes in the washer). It works by detecting current draw, motion or both, and currently supports notifications via Pushover and Twilio SMS.
+An IoT project with the goal of automatically identifying the beginning and end of laundry cycles and sending notifiations (because everyone hates when they forget their clothes in the washer). It works by detecting current draw, motion or both, and currently supports notifications via Pushover, Twilio SMS and email.
 
 ## Bill of Materials
 
@@ -95,6 +95,19 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
     - The registered phone number notifications will be sent from, provided via the Twilio web console. The phone number should include the country code and no other special characters (e.g. +15555555555).
 - Twilio To Numbers (default: blank)
     - A comma-separated list of phone numbers notifications will be sent to. The phone numbers should include the country code and no other special characters (e.g. +15555555555,+16666666666).
+<!-- -->
+- Email Enabled? (default: un-checked)
+    - Determines whether notifications are sent via email.
+- Email SMTP Host (default: blank)
+    - The hostname of your email provider's SMTP server.
+- Email SMTP Port (default: 0)
+    - The port your email provider's SMTP server uses.
+- Email SMTP Account (default: blank)
+    - The email account used to sign in to your email provider's SMTP server. Also used as the from address of the email notification.
+- Email SMTP Password (default: blank)
+    - The password used to sign in to your email provider's SMTP server.
+- Email To Addresses (default: blank)
+    - A comma-separated list of email addresses notifications will be sent to (e.g. tom<span>@tom.com,jerry<span>@jerry.com).
 <!-- -->
 - Debug Mode (default: un-checked)
     - Enable to replace the cycle status message with sensor outputs on the screen. May be helpful adjusting threshold values.

@@ -5,7 +5,7 @@
 
 const String CONFIG_FILE_LOCATION = "/config.json";
 
-DynamicJsonDocument json(1024);
+DynamicJsonDocument json(2048);
 struct config configStruct;
 
 bool configLoaded, 
@@ -102,6 +102,24 @@ struct config getConfig() {
         if (json.containsKey("twilioToNumbers")) {
             configStruct.twilioToNumbers = json["twilioToNumbers"].as<String>();
         }
+        if (json.containsKey("emailEnabled")) {
+            configStruct.emailEnabled = json["emailEnabled"].as<bool>();
+        }
+        if (json.containsKey("emailSmtpHost")) {
+            configStruct.emailSmtpHost = json["emailSmtpHost"].as<String>();
+        }
+        if (json.containsKey("emailSmtpPort")) {
+            configStruct.emailSmtpPort = json["emailSmtpPort"].as<int>();
+        }
+        if (json.containsKey("emailSmtpAccount")) {
+            configStruct.emailSmtpAccount = json["emailSmtpAccount"].as<String>();
+        }
+        if (json.containsKey("emailSmtpPassword")) {
+            configStruct.emailSmtpPassword = json["emailSmtpPassword"].as<String>();
+        }
+        if (json.containsKey("emailToAddresses")) {
+            configStruct.emailToAddresses = json["emailToAddresses"].as<String>();
+        }
         if (json.containsKey("debugMode")) {
             configStruct.debugMode = json["debugMode"].as<bool>();
         }
@@ -136,6 +154,12 @@ void saveConfig(struct config config) {
     json["twilioAuthToken"] = config.twilioAuthToken;
     json["twilioFromNumber"] = config.twilioFromNumber;
     json["twilioToNumbers"] = config.twilioToNumbers;
+    json["emailEnabled"] = config.emailEnabled;
+    json["emailSmtpHost"] = config.emailSmtpHost;
+    json["emailSmtpPort"] = config.emailSmtpPort;
+    json["emailSmtpAccount"] = config.emailSmtpAccount;
+    json["emailSmtpPassword"] = config.emailSmtpPassword;
+    json["emailToAddresses"] = config.emailToAddresses;
     json["debugMode"] = config.debugMode;
 
     File configFile = SPIFFS.open(CONFIG_FILE_LOCATION, "w");
