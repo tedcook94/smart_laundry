@@ -30,7 +30,9 @@ const char* PUSHOVER_ROOT_CA =
 WiFiClientSecure pushoverClient;
 struct config notificationConfig;
 
-bool notificationConfigLoaded = false;
+bool notificationConfigLoaded = false,
+    pushoverNotificationSent = false;
+int pushoverAttempts = 0;
 
 void loadNotificationConfig() {
     if (!notificationConfigLoaded) {
@@ -53,25 +55,33 @@ void sendPushoverNotification(String message) {
                                     "&message=" + message;
 
             pushoverClient.setCACert(PUSHOVER_ROOT_CA);
-            if (pushoverClient.connect("api.pushover.net", 443)) {
-                pushoverClient.println("POST /1/messages.json HTTP/1.1");
-                pushoverClient.println("Host: api.pushover.net");
-                pushoverClient.println("Connection: close\r\nContent-Type: application/x-www-form-urlencoded");
-                pushoverClient.print("Content-Length: ");
-                pushoverClient.print(pushoverParameters.length());
-                pushoverClient.println("\r\n");
-                pushoverClient.print(pushoverParameters);
 
-                while (pushoverClient.connected()) {
-                    while (pushoverClient.available()) {
-                        Serial.write(pushoverClient.read());
+            while (!pushoverNotificationSent && pushoverAttempts < 3) {
+                if (pushoverClient.connect("api.pushover.net", 443)) {
+                    pushoverClient.println("POST /1/messages.json HTTP/1.1");
+                    pushoverClient.println("Host: api.pushover.net");
+                    pushoverClient.println("Connection: close\r\nContent-Type: application/x-www-form-urlencoded");
+                    pushoverClient.print("Content-Length: ");
+                    pushoverClient.print(pushoverParameters.length());
+                    pushoverClient.println("\r\n");
+                    pushoverClient.print(pushoverParameters);
+
+                    while (pushoverClient.connected()) {
+                        while (pushoverClient.available()) {
+                            Serial.write(pushoverClient.read());
+                        }
                     }
+                    
+                    pushoverClient.stop();
+                    pushoverNotificationSent = true;
+                } else {
+                    writeToCenterOfOled("Pushover failed", true, 5000);
+                    pushoverAttempts += 1;
                 }
-                
-                pushoverClient.stop();
-            } else {
-                writeToCenterOfOled("Pushover failed", true, 5000);
             }
+
+            pushoverNotificationSent = false;
+            pushoverAttempts = 0;
         }
     }
 }
