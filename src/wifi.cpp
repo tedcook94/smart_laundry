@@ -14,11 +14,11 @@
 
 const char* MENU[] = {"wifi", "param", "sep", "info", "update", "sep", "exit"};
 const char* STYLE_CSS = "<style>" \
-                        "   #device_name, #motion_stop_duration, #current_stop_duration, #cycle_stop_notification, #pushover_user_token" \
+                        "   #device_name, #motion_stop_duration, #current_stop_duration, #cycle_stop_notification, #pushover_user_token, #twilio_to_numbers" \
                         "       { margin-bottom: 25px; }" \
-                        "   #motion_enabled, #current_enabled, #pushover_enabled" \
+                        "   #motion_enabled, #current_enabled, #pushover_enabled, #twilio_enabled" \
                         "       { margin-bottom: 10px; }" \
-                        "   label[for='motion_enabled']::after, label[for='current_enabled']::after, label[for='pushover_enabled']::after" \
+                        "   label[for='motion_enabled']::after, label[for='current_enabled']::after, label[for='pushover_enabled']::after, label[for='twilio_enabled']::after" \
                         "       { content: ''; display: block; }" \
                         "</style>";
 const String UNCHECKED_BOX_HTML = "type=\"checkbox\" onchange=\"this.value = this.checked ? 't' : ''\"",
@@ -46,6 +46,11 @@ WiFiManagerParameter deviceNameParameter,
     pushoverEnabledParameter,
     pushoverAppTokenParameter,
     pushoverUserTokenParameter,
+    twilioEnabledParameter,
+    twilioAccountSidParameter,
+    twilioAuthTokenParameter,
+    twilioFromNumberParameter,
+    twilioToNumbersParameter,
     debugModeParameter;
 
 void setupWifi() {
@@ -99,6 +104,17 @@ void setupWifi() {
         wifiConfig.pushoverAppToken.c_str(), 30);
     new (&pushoverUserTokenParameter) WiFiManagerParameter("pushover_user_token", "Pushover User Token", 
         wifiConfig.pushoverUserToken.c_str(), 30);
+    new (&twilioEnabledParameter) WiFiManagerParameter("twilio_enabled", "Twilio Enabled?", 
+        wifiConfig.twilioEnabled ? "t" : "", 1, 
+        wifiConfig.twilioEnabled ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&twilioAccountSidParameter) WiFiManagerParameter("twilio_account_sid", "Twilio Account SID", 
+        wifiConfig.twilioAccountSid.c_str(), 34);
+    new (&twilioAuthTokenParameter) WiFiManagerParameter("twilio_auth_token", "Twilio Auth Token", 
+        wifiConfig.twilioAuthToken.c_str(), 32);
+    new (&twilioFromNumberParameter) WiFiManagerParameter("twilio_from_number", "Twilio From Number", 
+        wifiConfig.twilioFromNumber.c_str(), 16);
+    new (&twilioToNumbersParameter) WiFiManagerParameter("twilio_to_numbers", "Twilio To Numbers", 
+        wifiConfig.twilioToNumbers.c_str(), 100);
     new (&debugModeParameter) WiFiManagerParameter("debug_mode", "Debug Mode", 
         wifiConfig.debugMode ? "t" : "", 1, 
         wifiConfig.debugMode ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
@@ -122,6 +138,12 @@ void setupWifi() {
     wm.addParameter(&pushoverEnabledParameter);
     wm.addParameter(&pushoverAppTokenParameter);
     wm.addParameter(&pushoverUserTokenParameter);
+
+    wm.addParameter(&twilioEnabledParameter);
+    wm.addParameter(&twilioAccountSidParameter);
+    wm.addParameter(&twilioAuthTokenParameter);
+    wm.addParameter(&twilioFromNumberParameter);
+    wm.addParameter(&twilioToNumbersParameter);
 
     wm.addParameter(&debugModeParameter);
 
@@ -169,6 +191,11 @@ void saveWifiConfig() {
     wifiConfig.pushoverEnabled = strncmp(pushoverEnabledParameter.getValue(), "t", 1) == 0;
     wifiConfig.pushoverAppToken = pushoverAppTokenParameter.getValue();
     wifiConfig.pushoverUserToken = pushoverUserTokenParameter.getValue();
+    wifiConfig.twilioEnabled = strncmp(twilioEnabledParameter.getValue(), "t", 1) == 0;
+    wifiConfig.twilioAccountSid = twilioAccountSidParameter.getValue();
+    wifiConfig.twilioAuthToken = twilioAuthTokenParameter.getValue();
+    wifiConfig.twilioFromNumber = twilioFromNumberParameter.getValue();
+    wifiConfig.twilioToNumbers = twilioToNumbersParameter.getValue();
     wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
 
     saveConfig(wifiConfig);

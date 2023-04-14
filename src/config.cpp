@@ -69,9 +69,6 @@ struct config getConfig() {
         if (json.containsKey("currentStopDuration")) {
             configStruct.currentStopDuration = json["currentStopDuration"].as<int>();
         }
-        if (json.containsKey("pushoverAppToken")) {
-            configStruct.pushoverAppToken = json["pushoverAppToken"].as<String>();
-        }
         if (json.containsKey("startupNotification")) {
             configStruct.startupNotification = json["startupNotification"].as<bool>();
         }
@@ -84,8 +81,26 @@ struct config getConfig() {
         if (json.containsKey("pushoverEnabled")) {
             configStruct.pushoverEnabled = json["pushoverEnabled"].as<bool>();
         }
+        if (json.containsKey("pushoverAppToken")) {
+            configStruct.pushoverAppToken = json["pushoverAppToken"].as<String>();
+        }
         if (json.containsKey("pushoverUserToken")) {
             configStruct.pushoverUserToken = json["pushoverUserToken"].as<String>();
+        }
+        if (json.containsKey("twilioEnabled")) {
+            configStruct.twilioEnabled = json["twilioEnabled"].as<bool>();
+        }
+        if (json.containsKey("twilioAccountSid")) {
+            configStruct.twilioAccountSid = json["twilioAccountSid"].as<String>();
+        }
+        if (json.containsKey("twilioAuthToken")) {
+            configStruct.twilioAuthToken = json["twilioAuthToken"].as<String>();
+        }
+        if (json.containsKey("twilioFromNumber")) {
+            configStruct.twilioFromNumber = json["twilioFromNumber"].as<String>();
+        }
+        if (json.containsKey("twilioToNumbers")) {
+            configStruct.twilioToNumbers = json["twilioToNumbers"].as<String>();
         }
         if (json.containsKey("debugMode")) {
             configStruct.debugMode = json["debugMode"].as<bool>();
@@ -116,6 +131,11 @@ void saveConfig(struct config config) {
     json["pushoverEnabled"] = config.pushoverEnabled;
     json["pushoverAppToken"] = config.pushoverAppToken;
     json["pushoverUserToken"] = config.pushoverUserToken;
+    json["twilioEnabled"] = config.twilioEnabled;
+    json["twilioAccountSid"] = config.twilioAccountSid;
+    json["twilioAuthToken"] = config.twilioAuthToken;
+    json["twilioFromNumber"] = config.twilioFromNumber;
+    json["twilioToNumbers"] = config.twilioToNumbers;
     json["debugMode"] = config.debugMode;
 
     File configFile = SPIFFS.open(CONFIG_FILE_LOCATION, "w");

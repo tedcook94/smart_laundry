@@ -18,6 +18,11 @@ struct config {
     bool pushoverEnabled = false;
     String pushoverAppToken = "";
     String pushoverUserToken = "";
+    bool twilioEnabled = false;
+    String twilioAccountSid = "";
+    String twilioAuthToken = "";
+    String twilioFromNumber = "";
+    String twilioToNumbers = "";
     bool debugMode = false;
 };
 

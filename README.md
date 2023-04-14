@@ -1,6 +1,6 @@
 # Smart Laundry
  
-An IoT project with the goal of automatically identifying the beginning and end of laundry cycles and sending notifiations (because everyone hates when they forget their clothes in the washer). It works by detecting current draw, motion or both.
+An IoT project with the goal of automatically identifying the beginning and end of laundry cycles and sending notifiations (because everyone hates when they forget their clothes in the washer). It works by detecting current draw, motion or both, and currently supports notifications via Pushover and Twilio SMS.
 
 ## Bill of Materials
 
@@ -83,6 +83,17 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
     - App token provided via the Pushover web console.
 - Pushover User Token (default: blank)
     - User token provided via the Pushover web console.
+<!-- -->
+- Twilio Enabled? (default: un-checked)
+    - Determines whether notifications are sent via [the Twilio SMS platform](https://www.twilio.com/en-us/messaging/channels/sms).
+- Twilio Account SID (default: blank)
+    - Account SID provided via the Twilio web console.
+- Twilio Auth Token (default: blank)
+    - Auth token provided via the Twilio web console.
+- Twilio From Number (default: blank)
+    - The registered phone number notifications will be sent from, provided via the Twilio web console. The phone number should include the country code and no other special characters (e.g. +15555555555).
+- Twilio To Numbers (default: blank)
+    - A comma-separated list of phone numbers notifications will be sent to. The phone numbers should include the country code and no other special characters (e.g. +15555555555,+16666666666).
 <!-- -->
 - Debug Mode (default: un-checked)
     - Enable to replace the cycle status message with sensor outputs on the screen. May be helpful adjusting threshold values.

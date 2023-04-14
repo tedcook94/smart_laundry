@@ -1,6 +1,7 @@
 #include "notification.h"
 #include "config.h"
 #include "oled.h"
+#include <twilio.hpp>
 #include <WiFiClientSecure.h>
 
 const char* PUSHOVER_ROOT_CA =
@@ -27,12 +28,15 @@ const char* PUSHOVER_ROOT_CA =
     "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n" \
     "-----END CERTIFICATE-----\n";
 
+Twilio *twilio;
 WiFiClientSecure pushoverClient;
 struct config notificationConfig;
 
 bool notificationConfigLoaded = false,
-    pushoverNotificationSent = false;
-int pushoverAttempts = 0;
+    pushoverNotificationSent = false,
+    twilioNotificationSent = false;
+int pushoverAttempts = 0,
+    twilioAttempts = 0;
 
 void loadNotificationConfig() {
     if (!notificationConfigLoaded) {
@@ -75,7 +79,8 @@ void sendPushoverNotification(String message) {
                     pushoverClient.stop();
                     pushoverNotificationSent = true;
                 } else {
-                    writeToCenterOfOled("Pushover failed", true, 5000);
+                    String pushoverFailedMessages[] = {"Pushover failed", "Attempt " + String(pushoverAttempts + 1)};
+                    writeToCenterOfOled(pushoverFailedMessages, 2, true, 5000);
                     pushoverAttempts += 1;
                 }
             }
@@ -86,14 +91,54 @@ void sendPushoverNotification(String message) {
     }
 }
 
+void sendTwilioNotification(String message) {
+    if (notificationConfig.twilioEnabled) {
+        if (notificationConfig.twilioAccountSid.length() == 0 || 
+                notificationConfig.twilioAuthToken.length() == 0 ||
+                notificationConfig.twilioFromNumber.length() == 0 ||
+                notificationConfig.twilioToNumbers.length() == 0) {
+            writeToCenterOfOled("Configure Twilio", true, 5000);
+        } else {
+            twilio = new Twilio(notificationConfig.twilioAccountSid.c_str(), notificationConfig.twilioAuthToken.c_str());
+
+            char toNumbers[notificationConfig.twilioToNumbers.length()];
+            notificationConfig.twilioToNumbers.toCharArray(toNumbers, notificationConfig.twilioToNumbers.length() + 1);
+            char *currentToNumber = NULL;
+            currentToNumber = strtok(toNumbers, ",");
+            
+            while (currentToNumber != NULL) {
+                while (!twilioNotificationSent && twilioAttempts < 3) {
+                    String response;
+                    if (twilio->send_message(currentToNumber, notificationConfig.twilioFromNumber, message, response)) {
+                        Serial.println(response);
+                        twilioNotificationSent = true;
+                    } else {
+                        String twilioFailedMessages[] = {"Twilio failed", currentToNumber, "Attempt " + String(twilioAttempts + 1)};
+                        writeToCenterOfOled(twilioFailedMessages, 3, true, 5000);
+                        twilioAttempts += 1;
+                    }
+                }
+
+                currentToNumber = strtok(NULL, ",");
+                twilioNotificationSent = false;
+                twilioAttempts = 0;
+            }
+        }
+    }
+}
+
 void sendStartupNotification() {
     loadNotificationConfig();
 
-    sendPushoverNotification(getDeviceName() + " has started and is online!");
+    String message = getDeviceName() + " has started and is online!";
+    sendPushoverNotification(message);
+    sendTwilioNotification(message);
 }
 
 void sendCycleNotification(String cycleStatus) {
     loadNotificationConfig();
 
-    sendPushoverNotification(getDeviceName() + " cycle " + cycleStatus + "!");
+    String message = getDeviceName() + " cycle " + cycleStatus + "!";
+    sendPushoverNotification(message);
+    sendTwilioNotification(message);
 }
