@@ -5,10 +5,7 @@
 #include "notification.h"
 #include "oled.h"
 
-const float CURRENT_THRESHOLD = 1.0;
-const int CURRENT_START_DURATION = 0 * 1000,
-    CURRENT_STOP_DURATION = 180 * 1000,
-    LOOP_MIN_DURATION = 2000;
+const int LOOP_MIN_DURATION = 2000;
 
 struct config cycleConfig;
 
@@ -18,9 +15,12 @@ bool cycleConfigLoaded = false,
     currentInTransition = false, 
     motionDetected = false, 
     motionInTransition = false;
-float motionThreshold;
+float motionThreshold,
+    currentThreshold;
 int motionStartDuration,
-    motionStopDuration;
+    motionStopDuration,
+    currentStartDuration,
+    currentStopDuration;
 long currentTransitionStartTime, 
     motionTransitionStartTime;
 String progressBar = ".......";
@@ -35,6 +35,10 @@ void updateCycleStatus() {
         motionThreshold = cycleConfig.motionThreshold / 100.0;
         motionStartDuration = cycleConfig.motionStartDuration * 1000;
         motionStopDuration = cycleConfig.motionStopDuration * 1000;
+
+        currentThreshold = cycleConfig.currentThreshold;
+        currentStartDuration = cycleConfig.currentStartDuration * 1000;
+        currentStopDuration = cycleConfig.currentStopDuration * 1000;
     }
 
     if (!cycleConfig.motionEnabled && !cycleConfig.currentEnabled) {
@@ -46,7 +50,7 @@ void updateCycleStatus() {
 
     if (cycleConfig.currentEnabled) {
         float current = getAdcCurrent();
-        bool currentAboveThreshold = current >= CURRENT_THRESHOLD;
+        bool currentAboveThreshold = current >= currentThreshold;
 
         currentReadout = "I: " + String(current);
         currentDetectedMessage = currentAboveThreshold ? "C: true" : "C: false";
@@ -58,7 +62,7 @@ void updateCycleStatus() {
                     currentTransitionStartTime = millis();
                 }
 
-                if (millis() >= currentTransitionStartTime + CURRENT_STOP_DURATION) {
+                if (millis() >= currentTransitionStartTime + currentStopDuration) {
                     currentDetected = false;
                     currentInTransition = false;
                 }
@@ -73,7 +77,7 @@ void updateCycleStatus() {
                     currentTransitionStartTime = millis();
                 }
 
-                if (millis() >= currentTransitionStartTime + CURRENT_START_DURATION) {
+                if (millis() >= currentTransitionStartTime + currentStartDuration) {
                     currentDetected = true;
                     currentInTransition = false;
                 }
