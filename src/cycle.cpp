@@ -66,7 +66,7 @@ void updateCycleStatus() {
                     currentDetected = false;
                     currentInTransition = false;
                 }
-            } else if (!currentDetected && currentAboveThreshold) {
+            } else if (currentAboveThreshold) {
                 currentDetected = true;
                 currentInTransition = false;
             }
@@ -107,7 +107,7 @@ void updateCycleStatus() {
                     motionDetected = false;
                     motionInTransition = false;
                 }
-            } else if (!motionDetected && motionAboveThreshold) {
+            } else if (motionAboveThreshold) {
                 motionDetected = true;
                 motionInTransition = false;
             }
