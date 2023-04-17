@@ -143,7 +143,6 @@ void saveConfig(struct config config) {
     json["currentThreshold"] = config.currentThreshold;
     json["currentStartDuration"] = config.currentStartDuration;
     json["currentStopDuration"] = config.currentStopDuration;
-    json["motionStopDuration"] = config.motionStopDuration;
     json["startupNotification"] = config.startupNotification;
     json["cycleStartNotification"] = config.cycleStartNotification;
     json["cycleStopNotification"] = config.cycleStopNotification;
