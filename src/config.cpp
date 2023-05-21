@@ -123,6 +123,9 @@ struct config getConfig() {
         if (json.containsKey("debugMode")) {
             configStruct.debugMode = json["debugMode"].as<bool>();
         }
+        if (json.containsKey("debugInfoInNotification")) {
+            configStruct.debugInfoInNotification = json["debugInfoInNotification"].as<bool>();
+        }
 
         configCached = true;
     }
@@ -161,6 +164,7 @@ void saveConfig(struct config config) {
     json["emailSmtpPassword"] = config.emailSmtpPassword;
     json["emailToAddresses"] = config.emailToAddresses;
     json["debugMode"] = config.debugMode;
+    json["debugInfoInNotification"] = config.debugInfoInNotification;
 
     File configFile = SPIFFS.open(CONFIG_FILE_LOCATION, "w");
     if (!configFile) {

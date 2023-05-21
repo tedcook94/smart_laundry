@@ -132,14 +132,20 @@ void updateCycleStatus() {
         inCycle = true;
         progressBar = ".......";
         if (cycleConfig.cycleStartNotification) {
-            sendCycleNotification("started");
+            if (cycleConfig.debugInfoInNotification) {
+                sendDebugCycleNotification("started", currentReadout, currentDetected, accelerometerReadout, motionDetected);
+            } else {
+                sendCycleNotification("started");
+            }
         }
     } else if (inCycle && (!cycleConfig.currentEnabled || !currentDetected) && (!cycleConfig.motionEnabled || !motionDetected)) {
         inCycle = false;
         progressBar = ".......";
-        if (cycleConfig.cycleStopNotification) {
-            sendCycleNotification("done");
-        }
+        if (cycleConfig.debugInfoInNotification) {
+                sendDebugCycleNotification("done", currentReadout, currentDetected, accelerometerReadout, motionDetected);
+            } else {
+                sendCycleNotification("done");
+            }
     }
 
     if (cycleConfig.debugMode) {

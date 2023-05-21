@@ -110,7 +110,9 @@ If you plan on using the included PCB files or enclosure designs, ensure that yo
     - A comma-separated list of email addresses notifications will be sent to (e.g. tom<span>@tom.com,jerry<span>@jerry.com).
 <!-- -->
 - Debug Mode (default: un-checked)
-    - Enable to replace the cycle status message with sensor outputs on the screen. May be helpful adjusting threshold values.
+    - Enable to replace the cycle status message with sensor outputs on the screen. May be helpful for adjusting threshold values.
+- Include Debug Info in Notification? (default: un-checked)
+    - Enable to include extra information about sensor outputs in your cycle notifications. May be helpful for adjusting threshold values.
 
 ---
 

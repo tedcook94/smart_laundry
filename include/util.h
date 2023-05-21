@@ -6,4 +6,6 @@ float getRootMeanSquare(float values[], int valueCount);
 
 float getStandardDeviation(float values[], int valueCount);
 
+String boolToString(bool value);
+
 #endif

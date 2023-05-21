@@ -26,3 +26,7 @@ float getStandardDeviation(float values[], int valueCount) {
 
     return sqrt(sdSum / valueCount);
 }
+
+String boolToString(bool value) {
+    return value ? "true" : "false";
+}

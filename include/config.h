@@ -30,6 +30,7 @@ struct config {
     String emailSmtpPassword = "";
     String emailToAddresses = "";
     bool debugMode = false;
+    bool debugInfoInNotification = false;
 };
 
 void setupConfig();

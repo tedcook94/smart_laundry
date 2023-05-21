@@ -1,6 +1,7 @@
 #include "notification.h"
 #include "config.h"
 #include "oled.h"
+#include "util.h"
 #include <ESP_Mail_Client.h>
 #include <twilio.hpp>
 #include <WiFiClientSecure.h>
@@ -198,3 +199,22 @@ void sendCycleNotification(String cycleStatus) {
     String message = getDeviceName() + " cycle " + cycleStatus + "!";
     sendNotification(message);
 }
+
+void sendDebugCycleNotification(
+        String cycleStatus, String currentReadout, bool currentDetected, 
+        String accelerometerReadout, bool motionDetected) {
+    loadNotificationConfig();
+
+    String message = getDeviceName() + " cycle " + cycleStatus + "!\n";
+
+    if (notificationConfig.currentEnabled) {
+        message += "\n" + currentReadout + "\nC: " + boolToString(currentDetected);
+    }
+
+    if (notificationConfig.motionEnabled) {
+        message += "\n" + accelerometerReadout + "\nM: " + boolToString(motionDetected);
+    }
+
+    sendNotification(message);
+}
+

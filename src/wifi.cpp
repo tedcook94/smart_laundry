@@ -57,7 +57,8 @@ WiFiManagerParameter deviceNameParameter,
     emailSmtpAccountParameter,
     emailSmtpPasswordParameter,
     emailToAddressesParameter,
-    debugModeParameter;
+    debugModeParameter,
+    debugInfoInNotificationParameter;
 
 void setupWifi() {
     pinMode(CONFIG_PIN, INPUT_PULLUP);
@@ -137,6 +138,9 @@ void setupWifi() {
     new (&debugModeParameter) WiFiManagerParameter("debug_mode", "Debug Mode", 
         wifiConfig.debugMode ? "t" : "", 1, 
         wifiConfig.debugMode ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
+    new (&debugInfoInNotificationParameter) WiFiManagerParameter("debug_info_in_notification", "Include Debug Info in Notification?", 
+        wifiConfig.debugInfoInNotification ? "t" : "", 1, 
+        wifiConfig.debugInfoInNotification ? CHECKED_BOX_HTML.c_str() : UNCHECKED_BOX_HTML.c_str(), WFM_LABEL_AFTER);
     
     wm.addParameter(&deviceNameParameter);
 
@@ -172,6 +176,7 @@ void setupWifi() {
     wm.addParameter(&emailToAddressesParameter);
 
     wm.addParameter(&debugModeParameter);
+    wm.addParameter(&debugInfoInNotificationParameter);
 
     writeSerialToOled("Connecting to wifi...");
     wmName = "SmartLaundry_" + (wifiConfig.deviceName.length() == 0 ? WiFi.macAddress() : wifiConfig.deviceName);
@@ -229,6 +234,7 @@ void saveWifiConfig() {
     wifiConfig.emailSmtpPassword = emailSmtpPasswordParameter.getValue();
     wifiConfig.emailToAddresses = emailToAddressesParameter.getValue();
     wifiConfig.debugMode = strncmp(debugModeParameter.getValue(), "t", 1) == 0;
+    wifiConfig.debugInfoInNotification = strncmp(debugInfoInNotificationParameter.getValue(), "t", 1) == 0;
 
     saveConfig(wifiConfig);
 }
